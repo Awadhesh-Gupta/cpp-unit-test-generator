@@ -28,14 +28,19 @@ jobs:
         cd build
         ./runTests
 
-    - name: Generate Coverage Report (.gcov)
+    - name: Generate Coverage Report
       run: |
         cd build
-        gcov -o . ../src/calculator.cpp
+        echo "Running gcov..."
+        gcov calculator.o || true
+        echo "Listing .gcov files:"
+        ls -l *.gcov || true
+        echo "Showing content of .gcov:"
+        cat calculator.cpp.gcov || echo "No .gcov file generated"
 
     - name: Upload .gcov Coverage Report
       uses: actions/upload-artifact@v3
       with:
         name: gcov-report
-        path: build/calculator.cpp.gcov
+        path: build/*.gcov
 
