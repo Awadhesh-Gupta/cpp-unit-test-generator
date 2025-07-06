@@ -24,19 +24,24 @@ jobs:
         g++ -fprofile-arcs -ftest-coverage -O0 calculator.o calculator_test.o -lgtest -lgtest_main -pthread -o runTests
         ./runTests
 
-    - name: Generate Coverage Report (gcov)
+    - name: Generate lcov coverage info
       run: |
         cd build
-        echo "Running gcov..."
-        gcov calculator.o || true
-        echo "Listing .gcov files:"
-        ls -l *.gcov || true
-        echo "Showing content of calculator.cpp.gcov:"
-        cat calculator.cpp.gcov || echo "No .gcov file generated"
+        lcov --capture --directory . --output-file coverage.info
 
-    - name: Upload Coverage Report Artifact
-      uses: actions/upload-artifact@v3
+    - name: Display coverage summary
+      run: |
+        cd build
+        lcov --summary coverage.info
+
+    - name: Generate HTML coverage report
+      run: |
+        cd build
+        genhtml coverage.info --output-directory coverage-report
+
+    - name: Upload HTML coverage report
+      uses: actions/upload-artifact@v4
       with:
-        name: coverage-report
-        path: build/*.gcov
+        name: coverage-html-report
+        path: build/coverage-report/
 
