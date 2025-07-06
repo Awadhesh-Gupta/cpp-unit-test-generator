@@ -39,7 +39,7 @@ jobs:
         cat calculator.cpp.gcov || echo "No .gcov file generated"
 
     - name: Upload .gcov Coverage Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: gcov-report
         path: |
