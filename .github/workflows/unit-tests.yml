@@ -1,43 +1,47 @@
-name: C++ Unit Tests and Coverage
+name: C++ GoogleTest with Coverage
 
 on: [push, pull_request]
 
 jobs:
-  build-and-test:
+  build-test-coverage:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y g++ cmake libgtest-dev lcov gcovr
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ cmake lcov libgtest-dev
 
-    - name: Build Project with Coverage
-      run: |
-        mkdir -p build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage" ..
-        make
+      - name: Configure CMake with coverage flags
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_CXX_FLAGS="--coverage" ..
+          make
 
-    - name: Run Tests
-      run: |
-        cd build
-        ./runTests
+      - name: Run unit tests
+        run: |
+          cd build
+          ctest --output-on-failure
 
-    - name: Generate Coverage Report
-      run: |
-        cd build
-        gcovr -r .. --html --html-details -o coverage.html
-        gcovr -r .. --xml -o coverage.xml
+      - name: Generate coverage report
+        run: |
+          cd build
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info
+          lcov --list coverage.info
 
-    - name: Upload Coverage Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: |
-          build/coverage.html
-          build/coverage.xml
+      - name: Generate HTML coverage report
+        run: |
+          cd build
+          genhtml coverage.info --output-directory coverage-report
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/coverage-report
 
