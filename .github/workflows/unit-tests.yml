@@ -13,35 +13,30 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y g++ cmake libgtest-dev lcov
+        sudo apt-get install -y g++ cmake libgtest-dev lcov gcovr
 
-    - name: Build with Coverage Flags
+    - name: Build and Run Tests with Coverage Flags
       run: |
-        mkdir build
+        mkdir -p build
         cd build
         g++ -c -fprofile-arcs -ftest-coverage -O0 -std=c++14 -I../src -I/usr/include/gtest ../src/calculator.cpp -o calculator.o
         g++ -c -fprofile-arcs -ftest-coverage -O0 -std=c++14 -I../src -I/usr/include/gtest ../tests/calculator_test.cpp -o calculator_test.o
         g++ -fprofile-arcs -ftest-coverage -O0 calculator.o calculator_test.o -lgtest -lgtest_main -pthread -o runTests
-
-    - name: Run Tests
-      run: |
-        cd build
         ./runTests
 
-    - name: Generate Coverage Report
+    - name: Generate Coverage Report (gcov)
       run: |
         cd build
         echo "Running gcov..."
         gcov calculator.o || true
         echo "Listing .gcov files:"
         ls -l *.gcov || true
-        echo "Showing content of .gcov:"
+        echo "Showing content of calculator.cpp.gcov:"
         cat calculator.cpp.gcov || echo "No .gcov file generated"
 
-    - name: Upload .gcov Coverage Report
-      uses: actions/upload-artifact@v4
+    - name: Upload Coverage Report Artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: gcov-report
-        path: |
-          build/*.gcov
+        name: coverage-report
+        path: build/*.gcov
 
