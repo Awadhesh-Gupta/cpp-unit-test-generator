@@ -1,0 +1,4 @@
+/mnt/d/projects/cpp-unit-test-generator/build/CMakeFiles/runTests.dir
+/mnt/d/projects/cpp-unit-test-generator/build/CMakeFiles/test.dir
+/mnt/d/projects/cpp-unit-test-generator/build/CMakeFiles/edit_cache.dir
+/mnt/d/projects/cpp-unit-test-generator/build/CMakeFiles/rebuild_cache.dir

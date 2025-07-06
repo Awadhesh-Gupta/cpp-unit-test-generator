@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/runTests.dir/src/calculator.cpp.o CMakeFiles/runTests.dir/tests/calculator_test.cpp.o -o runTests  -lgtest -lgtest_main -lpthread 

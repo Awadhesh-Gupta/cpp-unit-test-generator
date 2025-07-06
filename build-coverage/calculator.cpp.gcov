@@ -1,0 +1,36 @@
+        -:    0:Source:../src/calculator.cpp
+        -:    0:Graph:./calculator.gcno
+        -:    0:Data:./calculator.gcda
+        -:    0:Runs:1
+        -:    1:#include "calculator.h"
+        -:    2:#include <cmath>
+        -:    3:#include <stdexcept>
+        -:    4:
+        1:    5:double Calculator::add(double a, double b) {
+        1:    6:    return a + b;
+        -:    7:}
+        -:    8:
+        1:    9:double Calculator::subtract(double a, double b) {
+        1:   10:    return a - b;
+        -:   11:}
+        -:   12:
+        2:   13:double Calculator::multiply(double a, double b) {
+        2:   14:    return a * b;
+        -:   15:}
+        -:   16:
+        3:   17:double Calculator::divide(double a, double b) {
+        3:   18:    if (b == 0)
+        1:   19:        throw std::invalid_argument("Division by zero");
+        2:   20:    return a / b;
+        -:   21:}
+        -:   22:
+        2:   23:double Calculator::power(double base, double exponent) {
+        2:   24:    return std::pow(base, exponent);
+        -:   25:}
+        -:   26:
+        3:   27:double Calculator::sqrt(double value) {
+        3:   28:    if (value < 0)
+        2:   29:        throw std::domain_error("Square root of negative number");
+        1:   30:    return std::sqrt(value);
+        -:   31:}
+        -:   32:

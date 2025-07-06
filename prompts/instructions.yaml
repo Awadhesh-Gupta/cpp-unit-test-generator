@@ -1,0 +1,16 @@
+test_generation:
+  framework: gtest
+  include_headers: true
+  test_format: standard
+  avoid_duplicates: true
+  enforce_exception_tests: true
+  improve_coverage: true
+
+test_coverage:
+  report_format: text
+  minimum_coverage: 90
+
+build:
+  compiler: g++
+  flags: "-std=c++14 -fprofile-arcs -ftest-coverage"
+  libraries: [gtest, gtest_main, pthread]
