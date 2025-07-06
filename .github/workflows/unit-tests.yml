@@ -1,8 +1,6 @@
 name: C++ Unit Tests and Coverage
 
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
   build-and-test:
@@ -12,44 +10,34 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y g++ cmake libgtest-dev lcov gcovr
 
-    - name: Clean old coverage data and build folder
+    - name: Build Project with Coverage
       run: |
-        find . -name '*.gcda' -delete
-        find . -name '*.gcno' -delete
-        rm -rf build
-        mkdir build
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage" ..
+        make
 
-    - name: Build with coverage flags and run tests
+    - name: Run Tests
       run: |
         cd build
-        g++ -c -fprofile-arcs -ftest-coverage -O0 -std=c++14 -I../src -I/usr/include/gtest ../src/calculator.cpp -o calculator.o
-        g++ -c -fprofile-arcs -ftest-coverage -O0 -std=c++14 -I../src -I/usr/include/gtest ../tests/calculator_test.cpp -o calculator_test.o
-        g++ -fprofile-arcs -ftest-coverage -O0 calculator.o calculator_test.o -lgtest -lgtest_main -pthread -o runTests
         ./runTests
 
-    - name: Generate coverage info
+    - name: Generate Coverage Report
       run: |
         cd build
-        lcov --capture --directory . --output-file coverage.info --ignore-errors source
+        gcovr -r .. --html --html-details -o coverage.html
+        gcovr -r .. --xml -o coverage.xml
 
-    - name: Display coverage summary
-      run: |
-        cd build
-        lcov --summary coverage.info
-
-    - name: Generate HTML coverage report
-      run: |
-        cd build
-        genhtml coverage.info --output-directory coverage-report
-
-    - name: Upload coverage report artifact
+    - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
-        path: build/coverage-report
+        path: |
+          build/coverage.html
+          build/coverage.xml
 
