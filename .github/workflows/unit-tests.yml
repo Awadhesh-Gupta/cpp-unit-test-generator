@@ -1,47 +1,59 @@
 name: C++ Unit Tests and Coverage
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Install Dependencies
+    - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y g++ cmake libgtest-dev lcov gcovr
+        sudo apt-get install -y g++ cmake libgtest-dev lcov
 
-    - name: Build and Run Tests with Coverage Flags
+    - name: Clean old coverage data
       run: |
-        mkdir -p build
+        find . -name '*.gcda' -delete
+        find . -name '*.gcno' -delete
+        rm -rf build
+        mkdir build
+
+    - name: Build with coverage flags
+      run: |
         cd build
         g++ -c -fprofile-arcs -ftest-coverage -O0 -std=c++14 -I../src -I/usr/include/gtest ../src/calculator.cpp -o calculator.o
         g++ -c -fprofile-arcs -ftest-coverage -O0 -std=c++14 -I../src -I/usr/include/gtest ../tests/calculator_test.cpp -o calculator_test.o
         g++ -fprofile-arcs -ftest-coverage -O0 calculator.o calculator_test.o -lgtest -lgtest_main -pthread -o runTests
+
+    - name: Run tests
+      run: |
+        cd build
         ./runTests
 
     - name: Generate lcov coverage info
       run: |
         cd build
-        lcov --capture --directory . --output-file coverage.info
-
-    - name: Display coverage summary
-      run: |
-        cd build
-        lcov --summary coverage.info
+        lcov --capture --directory . --output-file coverage.info --ignore-errors mismatch
 
     - name: Generate HTML coverage report
       run: |
         cd build
         genhtml coverage.info --output-directory coverage-report
 
-    - name: Upload HTML coverage report
-      uses: actions/upload-artifact@v4
+    - name: Upload coverage report artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: coverage-html-report
-        path: build/coverage-report/
+        name: coverage-report
+        path: build/coverage-report
+
+    - name: Show coverage summary
+      run: |
+        cd build
+        lcov --summary coverage.info
 
